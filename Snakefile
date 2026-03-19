@@ -137,7 +137,8 @@ rule busco:
         "evaluation/busco/{sample}/short_summary.txt"
     params:
         lineage = config["busco"]["lineage"],
-        outdir  = "evaluation/busco/{sample}"
+        outname = "{sample}",
+        outpath = "evaluation/busco"
     threads: config["busco"]["threads"]
     log:
         "logs/busco/{sample}.log"
@@ -145,12 +146,14 @@ rule busco:
         """
         busco \
             -i {input} \
-            -o {params.outdir} \
+            -o {params.outname} \
+            --out_path {params.outpath} \
             -l {params.lineage} \
             -m genome \
             --cpu {threads} \
             --force \
             2> {log}
+        cp evaluation/busco/{params.outname}/short_summary.specific.*.txt {output}
         """
 
 # ─────────────────────────────────────────
