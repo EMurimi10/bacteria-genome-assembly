@@ -1,0 +1,30 @@
+# ── Samples ──────────────────────────────
+samples:
+  - sample1
+  - sample2
+  - sample3
+
+# ── Directories ──────────────────────────
+reads_dir: "reads"
+
+# ── Trimmomatic ───────────────────────────
+trimmomatic:
+  sliding_window: "4:20"
+  min_len: 50
+  leading: 3
+  trailing: 3
+
+# ── SPAdes ────────────────────────────────
+spades:
+  threads: 4
+  memory: 8
+
+# ── QUAST ─────────────────────────────────
+quast:
+  threads: 4
+  min_contig: 500
+
+# ── BUSCO ─────────────────────────────────
+busco:
+  lineage: "bacteria_odb10"
+  threads: 4
