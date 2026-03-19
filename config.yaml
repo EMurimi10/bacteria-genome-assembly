@@ -28,3 +28,13 @@ quast:
 busco:
   lineage: "bacteria_odb10"
   threads: 4
+
+# ── ABRicate AMR ──────────────────────────
+abricate:
+  databases:
+    - ncbi
+    - card
+    - resfinder
+  min_coverage: 80
+  min_identity: 90
+

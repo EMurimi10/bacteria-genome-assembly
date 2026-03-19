@@ -19,7 +19,11 @@ rule all:
         expand("assembly/{sample}/contigs.fasta", sample=SAMPLES),
         expand("evaluation/quast/{sample}/report.html", sample=SAMPLES),
         expand("evaluation/busco/{sample}/short_summary.txt", sample=SAMPLES),
-        expand("annotation/{sample}/{sample}.gff", sample=SAMPLES)  # NEW
+        expand("annotation/{sample}/{sample}.gff", sample=SAMPLES),
+        expand("amr/{sample}/{sample}_{db}.tsv",
+               sample=SAMPLES,
+               db=config["abricate"]["databases"]),
+        "amr/summary/amr_summary.tsv",
 
 # ─────────────────────────────────────────
 # STEP 1: FastQC
@@ -203,4 +207,46 @@ rule prokka:
             --force \
             {input} \
             2> {log}
+        """
+
+# ─────────────────────────────────────────
+# STEP 8: ABRicate — AMR Detection
+# ─────────────────────────────────────────
+rule abricate:
+    input:
+        "assembly/{sample}/contigs.fasta"
+    output:
+        "amr/{sample}/{sample}_{db}.tsv"
+    params:
+        db          = "{db}",
+        min_cov     = config["abricate"]["min_coverage"],
+        min_id      = config["abricate"]["min_identity"]
+    log:
+        "logs/abricate/{sample}_{db}.log"
+    shell:
+        """
+        abricate \
+            --db {params.db} \
+            --mincov {params.min_cov} \
+            --minid {params.min_id} \
+            {input} \
+            > {output} \
+            2> {log}
+        """
+
+# ─────────────────────────────────────────
+# STEP 9: ABRicate Summary — All samples
+# ─────────────────────────────────────────
+rule abricate_summary:
+    input:
+        expand("amr/{sample}/{sample}_{db}.tsv",
+               sample=SAMPLES,
+               db=config["abricate"]["databases"])
+    output:
+        "amr/summary/amr_summary.tsv"
+    log:
+        "logs/abricate/summary.log"
+    shell:
+        """
+        abricate --summary {input} > {output} 2> {log}
         """
