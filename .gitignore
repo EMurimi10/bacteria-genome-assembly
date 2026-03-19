@@ -1,0 +1,20 @@
+# Raw reads — too large for GitHub
+reads/
+trimmed/
+
+# Assembly outputs
+assembly/
+evaluation/
+
+# Snakemake internal files
+.snakemake/
+
+# Logs
+logs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
