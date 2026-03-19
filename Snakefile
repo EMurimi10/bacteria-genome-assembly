@@ -18,7 +18,8 @@ rule all:
         "qc/multiqc/multiqc_report.html",
         expand("assembly/{sample}/contigs.fasta", sample=SAMPLES),
         expand("evaluation/quast/{sample}/report.html", sample=SAMPLES),
-        expand("evaluation/busco/{sample}/short_summary.txt", sample=SAMPLES)
+        expand("evaluation/busco/{sample}/short_summary.txt", sample=SAMPLES),
+        expand("annotation/{sample}/{sample}.gff", sample=SAMPLES)  # NEW
 
 # ─────────────────────────────────────────
 # STEP 1: FastQC
@@ -171,5 +172,35 @@ rule multiqc:
         """
         multiqc qc/fastqc/ \
             -o qc/multiqc/ \
+            2> {log}
+        """
+
+# ─────────────────────────────────────────
+# STEP 7: Prokka — Genome Annotation
+# ─────────────────────────────────────────
+rule prokka:
+    input:
+        "assembly/{sample}/contigs.fasta"
+    output:
+        gff = "annotation/{sample}/{sample}.gff",
+        gbk = "annotation/{sample}/{sample}.gbk",
+        faa = "annotation/{sample}/{sample}.faa",
+        txt = "annotation/{sample}/{sample}.txt"
+    params:
+        outdir  = "annotation/{sample}",
+        prefix  = "{sample}",
+        kingdom = "Bacteria"
+    threads: 4
+    log:
+        "logs/prokka/{sample}.log"
+    shell:
+        """
+        prokka \
+            --outdir {params.outdir} \
+            --prefix {params.prefix} \
+            --kingdom {params.kingdom} \
+            --cpus {threads} \
+            --force \
+            {input} \
             2> {log}
         """
